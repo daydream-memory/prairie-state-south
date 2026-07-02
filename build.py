@@ -54,7 +54,7 @@ def render_body(body):
         trimmed = re.sub(r"^\n+", "", buf)
         trimmed = re.sub(r"\n+$", "", trimmed)
         if trimmed.strip():
-            return f'<pre class="text">{linkify(escape_html(trimmed))}</pre>'
+            return f'<p class="text">{linkify(escape_html(trimmed))}</p>'
         return ""
 
     for part in IMG_SPLIT.split(body):
@@ -71,12 +71,7 @@ def render_body(body):
 
 
 def render_entry(filename, raw):
-    lines = raw.replace("\r\n", "\n").split("\n")
-    i = 0
-    while i < len(lines) and lines[i].strip() == "":
-        i += 1
-    title = lines[i].strip() if i < len(lines) else ""
-    body = "\n".join(lines[i + 1:])
+    body = raw.replace("\r\n", "\n")
 
     entry_id = re.sub(r"\.txt$", "", filename, flags=re.IGNORECASE)
     date = date_from_filename(filename)
@@ -85,7 +80,6 @@ def render_entry(filename, raw):
         f'<article class="entry" id="{entry_id}">'
         f'<header class="entry-head">'
         f'<a class="date" href="#{entry_id}">{date}</a>'
-        f'<h2 class="title">{escape_html(title)}</h2>'
         f'</header>'
         f'{render_body(body)}'
         f'</article>'
