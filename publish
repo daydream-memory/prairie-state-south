@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# publish — build, commit, and push the site in one step.
+# run it from anywhere inside the repo:
+#     ./publish                 (auto commit message with the date)
+#     ./publish "spring burn"   (your own message)
+
+set -euo pipefail
+
+# work from the repo root, even if you're in a subfolder
+cd "$(git rev-parse --show-toplevel)"
+
+# build locally first — if the build is broken, stop before publishing
+python3 build.py
+
+# stage every change (new posts, images, edits, deletions)
+git add -A
+
+# if nothing changed, don't make an empty commit
+if git diff --cached --quiet; then
+  echo "nothing to publish — no changes."
+  exit 0
+fi
+
+# commit message: whatever you typed, or a timestamp if you typed nothing
+msg="${*:-publish $(date '+%Y-%m-%d %H:%M')}"
+git commit -m "$msg"
+git push
+
+echo "✓ published: $msg"
+echo "  live shortly at https://daydream-memory.github.io/prairie-state-south/"
